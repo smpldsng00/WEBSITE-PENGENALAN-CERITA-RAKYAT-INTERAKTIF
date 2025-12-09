@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ensiklopedia Cerita Rakyat Nusantara</title>
+<style>
+    body { 
+        margin:0; font-family:sans-serif; background:#000; 
+        display:flex; justify-content:center; align-items:center; height:100vh;
+        color: white; 
+        overflow: hidden; 
+    }
+
+    /* Gaya untuk Halaman Intro */
+    #intro-screen {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        background-color: rgba(0,0,0,0.8); 
+        display: flex; flex-direction: column; justify-content: center; align-items: center;
+        text-align: center;
+        opacity: 1; transition: opacity 1s ease-in-out;
+        z-index: 100; 
+    }
+    #intro-background {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        object-fit: cover;
+        opacity: 0.5; 
+        transition: opacity 1s ease-in-out;
+        z-index: 99;
+    }
+    #intro-content {
+        max-width: 800px; padding: 20px;
+        position: relative; 
+        z-index: 101;
+    }
+    #intro-screen h1 {
+        font-size: 2.5em; margin-bottom: 20px;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    }
+    #intro-screen p {
+        font-size: 1.1em; line-height: 1.6em; margin-bottom: 30px;
+        text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+    }
+    #start-button {
+        background:#E91E63; 
+        color:white; border:none; padding:15px 30px; border-radius:8px; cursor:pointer; 
+        font-size:1.2em; font-weight: bold;
+        transition: background 0.3s ease-in-out, transform 0.2s ease-in-out;
+    }
+    #start-button:hover {
+        background:#C2185B; 
+        transform: scale(1.05);
+    }
+
+    /* Gaya untuk Game Visual Novel */
+    #game {
+        width:100vw; height:100vh; position:relative; overflow:hidden; color:white;
+        opacity: 0; 
+        transition: opacity 1s ease-in-out;
+        z-index: 1; 
+    }
+    #background {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        object-fit: cover;
+        opacity: 0; transition: opacity 1s ease-in-out;
+        /* Z-index 1: Background */
+        z-index: 1; 
+    }
+    #character {
+        display: none; 
+    }
+    #textbox {
+        position:absolute; bottom:0; width:100%; background:rgba(0,0,0,0.7);
+        padding:20px; box-sizing:border-box;
+        z-index: 20;
+        opacity:0; transition: opacity 1s;
+    }
+    #text {
+        font-size:1.2em; line-height:1.5em; min-height:4em;
+    }
+    #choices { margin-top:10px; }
+    .choice-button { 
+        background:#0288D1; color:white; border:none; padding:10px 20px; margin:5px; border-radius:6px; cursor:pointer; font-size:1em;
+        transition: background 0.3s;
+    }
+    .choice-button:hover { background:#0277BD; }
+
+    /* --- CSS PENTING UNTUK SELEKSI CERITA --- */
+    #selection-wrapper {
+        position: relative; /* Penting untuk z-index */
+        z-index: 10; /* Pastikan di atas background (z-index: 1) */
+        display: flex; 
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+        justify-content: center; /* Posisikan konten di tengah vertikal */
+    }
+
+    .selection-layout {
+        display: flex; flex-direction: column; 
+        justify-content: center; 
+        align-items: center; 
+        height: 100%; 
+        padding: 20px; 
+        box-sizing: border-box;
+    }
+    .selection-layout h2 {
+        font-size: 2em; 
+        margin-bottom: 40px; 
+        text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
+        background: rgba(0,0,0,0.5); padding: 10px 20px; border-radius: 8px;
+    }
+    #selection-choices {
+        display: flex;
+        gap: 30px; 
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    .thumbnail-choice {
+        width: 250px; 
+        background: rgba(0,0,0,0.7);
+        border: 3px solid transparent;
+        border-radius: 10px;
+        overflow: hidden;
+        cursor: pointer;
+        transition: transform 0.3s, border-color 0.3s;
+        text-align: center;
+    }
+    .thumbnail-choice:hover {
+        transform: scale(1.05);
+        border-color: #FFEB3B; 
+        box-shadow: 0 0 20px rgba(255, 235, 59, 0.5);
+    }
+    .thumbnail-choice img {
+        width: 100%;
+        height: 180px; 
+        object-fit: cover;
+        display: block;
+    }
+    .thumbnail-choice p {
+        padding: 10px 5px;
+        font-size: 1.1em;
+        font-weight: bold;
+        margin: 0;
+        min-height: 50px; 
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Gaya untuk Tampilan Judul Cerita */
+    #textbox.story-title-box {
+        bottom: 50%; 
+        transform: translateY(50%); 
+        width: 80%; 
+        left: 10%; 
+        background: rgba(0,0,0,0.9);
+        border-radius: 10px;
+        padding: 40px;
+    }
+    #textbox.story-title-box #text {
+        text-align: center;
+        font-size: 2em;
+        font-weight: bold;
+        color: #FFC107; 
+        min-height: auto;
+    }
+    #textbox.story-title-box #choices {
+        text-align: center;
+        margin-top: 20px;
+    }
+</style>
+</head>
+<body>
+
+<div id="intro-screen">
+    <img id="intro-background" src="images/intro_bg.png" alt="Ilustrasi Buku Tua">
+    <div id="intro-content">
+        <h1>Ensiklopedia Cerita Rakyat Nusantara</h1>
+        <p>Selamat datang di gerbang misteri dan keajaiban! Website ini berfungsi sebagai ilustrasi interaktif untuk menjelajahi kekayaan cerita rakyat dari berbagai pelosok Nusantara. Setiap kisah di sini adalah fiksi yang terinspirasi dari kearifan lokal, mengundangmu untuk menjadi bagian dari legenda.</p>
+        <p>Siapkan dirimu untuk sebuah petualangan yang tak terduga...</p>
+        <button id="start-button">Mulai Petualangan</button>
+    </div>
+</div>
+
+<div id="game">
+    <img id="background" alt="Background Scene" /> 
+    <img id="character" alt="Character Sprite" /> 
+    <div id="textbox">
+        <div id="text"></div>
+        <div id="choices"></div>
+    </div>
+</div>
+
+<script>
+// --- DATA SCENES (SUDAH DIUBAH NAMA FILENYA) ---
+const scenes = {
+    selection: {
+        // NAMA FILE BARU
+        bg: "images/pilih cerita.png", 
+        char: "",
+        text: "PILIH CERITA RAKYAT NUSANTARA",
+        choices: [
+            { 
+                label: "MISTERI ROH GOA KUNO", 
+                go: "start_title",
+                // NAMA FILE BARU
+                thumbnail: "images/pria_goa_thumb-removebg-preview.png" 
+            },
+            { 
+                label: "LEGENDA PULAU NAGA (Coming Soon)", 
+                go: "selection", 
+                thumbnail: "images/placeholder_naga.png" 
+            },
+            { 
+                label: "KISAH PASAR IMPIAN (Coming Soon)", 
+                go: "selection",
+                thumbnail: "images/placeholder_pasar.png"
+            }
+        ],
+        isSelection: true 
+    },
+    start_title: {
+        bg: "images/pria_goa.png",
+        char: "",
+        text: "MISTERI ROH GOA KUNO", 
+        choices: [
+            { label: "Mulai Kisah", go: "start" }
+        ],
+        isTitle: true 
+    },
+    start: {
+        bg: "images/pria_goa.png", 
+        char: "",
+        text: "Di sebuah desa tua di kaki gunung, terdapat sebuah goa yang dipercaya menyimpan roh kuno. Tiba-tiba, sebuah kekuatan misterius muncul.",
+        choices: [
+            { label: "Selidiki sumber kekuatan itu", go: "scene2" },
+            { label: "Diam dan menjauh dari goa", go: "end1" }
+        ]
+    },
+    scene2: {
+        bg: "images/pria_goa.png", 
+        char: "", 
+        text: "Kamu merasakan energi kuno. Sebuah suara berbisik: ‘Hanya hati murni yang bisa membantu menjaga roh di sini.’",
+        choices: [
+            { label: "Tunjukkan hatimu yang murni", go: "scene3" },
+            { label: "Aku tidak percaya bisikan itu", go: "end1" }
+        ]
+    },
+    scene3: {
+        bg: "images/pria_goa.png", 
+        char: "", 
+        text: "Cahaya redup muncul di dalam goa. Kamu mendengar suara berkata: ‘Terima kasih, aku percaya padamu.’",
+        choices: [
+            { label: "Kuatkan segel goa bersama", go: "end2" },
+            { label: "Aku tidak bisa membantumu", go: "end1" }
+        ]
+    },
+    end1: {
+        bg: "images/pria_goa.png", 
+        char: "", 
+        text: "Cahaya dalam goa memudar. Kamu memilih menjauh.\n\nENDING 1 — Kamu memilih menjauh.",
+        choices: [
+            { label: "Kembali ke Pilihan Cerita", go: "selection" } 
+        ]
+    },
+    end2: {
+        bg: "images/pria_goa.png", 
+        char: "", 
+        text: "Cahaya segel kembali bersinar kuat. Misteri terselesaikan.\n\nENDING 2 — Cerita berakhir bahagia.",
+        choices: [
+            { label: "Kembali ke Pilihan Cerita", go: "selection" } 
+        ]
+    }
+};
+
+// --- ENGINE INTERAKTIF ---
+const introScreen = document.getElementById("intro-screen");
+const gameContainer = document.getElementById("game"); 
+const bgImg = document.getElementById("background");
+const charImg = document.getElementById("character");
+const textBox = document.getElementById("text");
+const choiceBox = document.getElementById("choices");
+const fullTextBox = document.getElementById("textbox"); 
+const startButton = document.getElementById("start-button");
+
+function fadeIn(element) {
+    element.style.opacity = 0;
+    setTimeout(() => { element.style.opacity = 1; }, 50); 
+}
+
+// FIX: Mengubah tujuan startButton ke halaman seleksi
+startButton.onclick = () => {
+    introScreen.style.opacity = 0; 
+    setTimeout(() => {
+        introScreen.style.display = 'none'; 
+        gameContainer.style.opacity = 1; 
+        loadScene("selection"); // Langsung ke halaman seleksi
+    }, 1000); 
+};
+
+
+function loadScene(key) {
+    const sc = scenes[key];
+    if(!sc) return;
+
+    // 1. Matikan elemen lama
+    bgImg.style.opacity = 0;
+    fullTextBox.style.opacity = 0;
+    
+    choiceBox.innerHTML = "";
+    textBox.innerText = "";
+    
+    // Reset Class
+    fullTextBox.classList.remove('story-title-box');
+    
+    // FIX KRUSIAL (Bersihkan Elemen Dinamis): Hapus selection-wrapper jika ada
+    const existingWrapper = document.getElementById('selection-wrapper');
+    if (existingWrapper) {
+        gameContainer.removeChild(existingWrapper);
+    }
+    
+    // Hapus kelas layout seleksi jika ada
+    gameContainer.classList.remove('selection-layout');
+
+    // Pastikan textbox terlihat (kecuali di seleksi)
+    fullTextBox.style.display = 'block';
+
+    // --- LOGIC BARU UNTUK HALAMAN SELEKSI (THUMBNAIL INTERAKTIF) ---
+    if (sc.isSelection) {
+        fullTextBox.style.display = 'none'; 
+        
+        // Tambahkan class untuk penataan halaman seleksi
+        gameContainer.classList.add('selection-layout');
+        
+        // 2. Buat kontainer untuk konten seleksi
+        const selectionContent = document.createElement('div');
+        selectionContent.id = 'selection-wrapper';
+        selectionContent.innerHTML = `<h2 id="selection-title">${sc.text}</h2><div id="selection-choices"></div>`;
+        gameContainer.appendChild(selectionContent); // Tambahkan wrapper
+
+        const selectionChoices = document.getElementById("selection-choices");
+        
+        // Muat gambar background
+        setTimeout(() => {
+            bgImg.src = sc.bg; 
+            fadeIn(bgImg);
+        }, 500); 
+
+        // Buat pilihan menggunakan thumbnail
+        sc.choices.forEach(c => {
+            const div = document.createElement("div");
+            div.className = "thumbnail-choice"; 
+            
+            // Tambahkan gambar dan label
+            div.innerHTML = `<img src="${c.thumbnail}" alt="${c.label}"> <p>${c.label}</p>`;
+
+            div.onclick = () => {
+                // Saat diklik, hapus selection-wrapper secara eksplisit
+                const wrapper = document.getElementById('selection-wrapper');
+                if (wrapper) {
+                    gameContainer.removeChild(wrapper);
+                }
+                loadScene(c.go);
+            };
+            selectionChoices.appendChild(div);
+        });
+
+        return; 
+    } 
+    
+    // --- LOGIC STANDARD UNTUK SCENE CERITA ---
+
+    if (sc.isTitle) {
+        fullTextBox.classList.add('story-title-box');
+    }
+    
+    // 2. Muat gambar baru dan teks 
+    setTimeout(() => {
+        bgImg.src = sc.bg; 
+        charImg.src = sc.char; 
+        textBox.innerText = sc.text;
+
+        // 3. Fade In elemen baru
+        fadeIn(bgImg);
+        fadeIn(fullTextBox);
+
+        // 4. Buat pilihan
+        sc.choices.forEach(c => {
+            const btn = document.createElement("button");
+            btn.innerText = c.label;
+            btn.className = "choice-button"; 
+            btn.onclick = () => loadScene(c.go);
+            choiceBox.appendChild(btn);
+        });
+
+    }, 500); 
+}
+</script>
+
+</body>
+</html>
