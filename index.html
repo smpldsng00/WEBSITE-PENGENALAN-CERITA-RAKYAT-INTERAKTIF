@@ -3,16 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ensiklopedia Cerita Rakyat Nusantara</title>
+<title>Ensiklopedia Cerita Rakyat Nusantara - Magical Edition</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=EB+Garamond&display=swap" rel="stylesheet" />
 <style>
+    /* ----------------------------------
+       GAYA UMUM & GAME ENGINE
+    ----------------------------------- */
     body { 
-        margin:0; font-family:sans-serif; background:#000; 
+        margin:0; font-family:'EB Garamond', serif; background:#000; 
         display:flex; justify-content:center; align-items:center; height:100vh;
         color: white; 
         overflow: hidden; 
     }
-
-    /* Gaya untuk Halaman Intro */
     #intro-screen {
         position: absolute; top: 0; left: 0; width: 100%; height: 100%;
         background-color: rgba(0,0,0,0.8); 
@@ -24,7 +26,7 @@
     #intro-background {
         position: absolute; top: 0; left: 0; width: 100%; height: 100%;
         object-fit: cover;
-        opacity: 0.5; 
+        opacity: 0.45; 
         transition: opacity 1s ease-in-out;
         z-index: 99;
     }
@@ -34,21 +36,23 @@
         z-index: 101;
     }
     #intro-screen h1 {
-        font-size: 2.5em; margin-bottom: 20px;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        font-family: 'Cinzel Decorative', serif;
+        font-size: 3rem; margin-bottom: 20px;
+        color: #ffd700; 
+        text-shadow: 0 0 10px #000; 
     }
     #intro-screen p {
         font-size: 1.1em; line-height: 1.6em; margin-bottom: 30px;
         text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
     }
     #start-button {
-        background:#E91E63; 
-        color:white; border:none; padding:15px 30px; border-radius:8px; cursor:pointer; 
-        font-size:1.2em; font-weight: bold;
-        transition: background 0.3s ease-in-out, transform 0.2s ease-in-out;
+        background: linear-gradient(135deg,#ffeb3b,#ff9800); 
+        color:black; border:none; padding:15px 40px; border-radius:15px; cursor:pointer; 
+        font-size:1.3rem; font-weight: bold;
+        box-shadow:0 0 15px #ffeb3b;
+        transition: transform 0.2s ease-in-out;
     }
     #start-button:hover {
-        background:#C2185B; 
         transform: scale(1.05);
     }
 
@@ -59,78 +63,103 @@
         transition: opacity 1s ease-in-out;
         z-index: 1; 
     }
-    #background {
-        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    
+    #background, #character {
+        position: absolute; inset: 0; width: 100%; height: 100%; 
         object-fit: cover;
-        opacity: 0; transition: opacity 1s ease-in-out;
-        /* Z-index 1: Background */
+    }
+
+    #background {
+        opacity: 0; transition: opacity .8s; 
         z-index: 1; 
     }
+
     #character {
         display: none; 
+        z-index: 5;
     }
+
     #textbox {
         position:absolute; bottom:0; width:100%; background:rgba(0,0,0,0.7);
         padding:20px; box-sizing:border-box;
         z-index: 20;
-        opacity:0; transition: opacity 1s;
+        opacity:0; transition: opacity .5s;
     }
     #text {
-        font-size:1.2em; line-height:1.5em; min-height:4em;
+        font-size:1.4rem; line-height:1.7; min-height:4em;
     }
-    #choices { margin-top:10px; }
-    .choice-button { 
-        background:#0288D1; color:white; border:none; padding:10px 20px; margin:5px; border-radius:6px; cursor:pointer; font-size:1em;
-        transition: background 0.3s;
+    #choices { 
+        margin-top:10px; 
+        transition: opacity 0.3s;
     }
-    .choice-button:hover { background:#0277BD; }
+    
+    /* GAYA KRITIS: TRANSITION OVERLAY (FITUR FADE IN/OUT) */
+    #transition-overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background-color: #000;
+        opacity: 0; 
+        z-index: 1000; 
+        pointer-events: none; 
+        transition: opacity 0.6s ease-in-out; 
+    }
 
-    /* --- CSS PENTING UNTUK SELEKSI CERITA --- */
-    #selection-wrapper {
-        position: relative; /* Penting untuk z-index */
-        z-index: 10; /* Pastikan di atas background (z-index: 1) */
-        display: flex; 
+    /* ----------------------------------
+       GAYA SELEKSI CERITA (POLOS)
+    ----------------------------------- */
+    .selection-layout {
+        display: flex;
         flex-direction: column;
+        justify-content: center;
         align-items: center;
         width: 100%;
         height: 100%;
-        justify-content: center; /* Posisikan konten di tengah vertikal */
+    }
+    
+    #selection-wrapper {
+        position: relative; 
+        z-index: 30; 
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        max-width: 90%;
+        padding: 20px;
+        border-radius: 15px;
     }
 
-    .selection-layout {
-        display: flex; flex-direction: column; 
-        justify-content: center; 
-        align-items: center; 
-        height: 100%; 
-        padding: 20px; 
-        box-sizing: border-box;
-    }
     .selection-layout h2 {
-        font-size: 2em; 
+        font-family: 'Cinzel Decorative', serif;
+        color:#ffd700;
+        font-size: 2.3rem; 
         margin-bottom: 40px; 
-        text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
-        background: rgba(0,0,0,0.5); padding: 10px 20px; border-radius: 8px;
+        text-shadow: 0 0 10px rgba(0,0,0,1); 
     }
+    
+    #tutorial-text {
+        color: #ffeb3b;
+        font-size: 1.1em;
+        margin-bottom: 40px;
+        text-shadow: 0 0 5px rgba(0,0,0,1); 
+    }
+
     #selection-choices {
         display: flex;
         gap: 30px; 
         justify-content: center;
         flex-wrap: wrap;
     }
+
     .thumbnail-choice {
-        width: 250px; 
-        background: rgba(0,0,0,0.7);
-        border: 3px solid transparent;
-        border-radius: 10px;
+        width: 260px; 
+        background: rgba(0,0,0,0.4); 
+        border-radius: 12px;
         overflow: hidden;
         cursor: pointer;
-        transition: transform 0.3s, border-color 0.3s;
+        transition: transform 0.3s, background-color 0.3s;
         text-align: center;
     }
     .thumbnail-choice:hover {
         transform: scale(1.05);
-        border-color: #FFEB3B; 
-        box-shadow: 0 0 20px rgba(255, 235, 59, 0.5);
+        background: rgba(0,0,0,0.6); 
     }
     .thumbnail-choice img {
         width: 100%;
@@ -139,6 +168,7 @@
         display: block;
     }
     .thumbnail-choice p {
+        color: white; 
         padding: 10px 5px;
         font-size: 1.1em;
         font-weight: bold;
@@ -165,21 +195,67 @@
         font-weight: bold;
         color: #FFC107; 
         min-height: auto;
+        text-shadow: 0 0 8px rgba(255, 215, 0, 0.8);
     }
-    #textbox.story-title-box #choices {
-        text-align: center;
-        margin-top: 20px;
+    
+    /* ----------------------------------
+       GAYA KONTROL & SPARKLES (FITUR)
+    ----------------------------------- */
+    .controls { 
+        position:fixed; top:18px; right:18px; display:flex; 
+        flex-direction:column; gap:10px; z-index:500; 
+    }
+    .fairy-btn { 
+        background:linear-gradient(135deg,#ffeb3b,#ff9800); 
+        padding:10px 25px; border-radius:12px; border:none; 
+        font-family:'EB Garamond', serif;
+        cursor:pointer; box-shadow:0 0 10px #FFC107;
+        color: black; font-weight: bold;
+        transition: transform 0.2s;
+    }
+    .fairy-btn:hover {
+        transform: scale(1.05);
+    }
+    
+    /* Efek Sparkle Bergerak */
+    #sparkles {
+        position: fixed; inset: 0; pointer-events: none; z-index: 5;
+        opacity: 0; transition: opacity 1s;
+    }
+
+    .star {
+        position: absolute;
+        width: 5px;
+        height: 5px;
+        background: #ffffcc;
+        border-radius: 50%;
+        box-shadow: 0 0 5px #ffcc00, 0 0 10px #ffffff;
+        animation: twinkle 5s infinite ease-in-out, drift 12s infinite linear; 
+        opacity: 0;
+    }
+    @keyframes twinkle {
+        0% { opacity: 0; transform: scale(0.5); }
+        50% { opacity: 1; transform: scale(1); }
+        100% { opacity: 0; transform: scale(0.5); }
+    }
+    @keyframes drift {
+        0% { transform: translateY(0vh) rotate(0deg); opacity: 0.2; }
+        50% { opacity: 0.8; }
+        100% { transform: translateY(-100vh) rotate(180deg); opacity: 0; }
     }
 </style>
 </head>
 <body>
 
+<div id="sparkles"></div>
+
+<div id="transition-overlay"></div>
+
 <div id="intro-screen">
     <img id="intro-background" src="images/intro_bg.png" alt="Ilustrasi Buku Tua">
     <div id="intro-content">
-        <h1>Ensiklopedia Cerita Rakyat Nusantara</h1>
-        <p>Selamat datang di gerbang misteri dan keajaiban! Website ini berfungsi sebagai ilustrasi interaktif untuk menjelajahi kekayaan cerita rakyat dari berbagai pelosok Nusantara. Setiap kisah di sini adalah fiksi yang terinspirasi dari kearifan lokal, mengundangmu untuk menjadi bagian dari legenda.</p>
-        <p>Siapkan dirimu untuk sebuah petualangan yang tak terduga...</p>
+        <h1>✨ Ensiklopedia Cerita Rakyat Nusantara 📜✨</h1>
+        <p>Selamat datang di gerbang misteri dan keajaiban! Website ini berfungsi sebagai ilustrasi interaktif untuk menjelajahi kekayaan cerita rakyat dari berbagai pelosok Nusantara.</p>
         <button id="start-button">Mulai Petualangan</button>
     </div>
 </div>
@@ -193,89 +269,93 @@
     </div>
 </div>
 
+<audio id="bgm" loop src=""></audio> 
+<div class="controls">
+    <button id="btn-bgm" class="fairy-btn">🎵 Musik</button>
+    <button id="btn-auto" class="fairy-btn">▶ Auto</button>
+    <button id="btn-stop" class="fairy-btn">⏸ Stop</button>
+    <button id="btn-back" class="fairy-btn">🔙 Menu</button>
+</div>
+
 <script>
-// --- DATA SCENES (SUDAH DIUBAH NAMA FILENYA) ---
+// --- DATA SCENES (DIPERBARUI DENGAN DESKRIPSI) ---
+const DEFAULT_BGM = "audio/selection_bgm.mp3"; 
+
 const scenes = {
     selection: {
-        // NAMA FILE BARU
-        bg: "images/pilih cerita.png", 
+        bg: "images/pilih_cerita.png", 
         char: "",
-        text: "PILIH CERITA RAKYAT NUSANTARA",
+        text: "PILIH LEGENDA INDONESIA 📜",
+        music: DEFAULT_BGM, 
         choices: [
-            { 
-                label: "MISTERI ROH GOA KUNO", 
-                go: "start_title",
-                // NAMA FILE BARU
-                thumbnail: "images/pria_goa_thumb-removebg-preview.png" 
-            },
-            { 
-                label: "LEGENDA PULAU NAGA (Coming Soon)", 
-                go: "selection", 
-                thumbnail: "images/placeholder_naga.png" 
-            },
-            { 
-                label: "KISAH PASAR IMPIAN (Coming Soon)", 
-                go: "selection",
-                thumbnail: "images/placeholder_pasar.png"
-            }
+            { label: "TIMUN MAS 🥒", go: "timun_mas_title", thumbnail: "images/timun_mas_thumb.png" },
+            { label: "LEGENDA DANAU TOBA 🌊", go: "toba_title", thumbnail: "images/toba_thumb.png" },
+            { label: "RORO JONGGRANG 🛕", go: "roro_jonggrang_title", thumbnail: "images/roro_jonggrang_thumb.png" }
         ],
         isSelection: true 
     },
-    start_title: {
-        bg: "images/pria_goa.png",
-        char: "",
-        text: "MISTERI ROH GOA KUNO", 
-        choices: [
-            { label: "Mulai Kisah", go: "start" }
-        ],
-        isTitle: true 
+    
+    // 1. SCENE TIMUN MAS
+    timun_mas_title: {
+        bg: "images/timun_mas_full.jpg", char: "", text: "👑 TIMUN MAS 🥒", isTitle: true, music: "audio/timun_mas_bgm.mp3", next: "timun_mas_desc" 
     },
-    start: {
-        bg: "images/pria_goa.png", 
-        char: "",
-        text: "Di sebuah desa tua di kaki gunung, terdapat sebuah goa yang dipercaya menyimpan roh kuno. Tiba-tiba, sebuah kekuatan misterius muncul.",
-        choices: [
-            { label: "Selidiki sumber kekuatan itu", go: "scene2" },
-            { label: "Diam dan menjauh dari goa", go: "end1" }
-        ]
+    timun_mas_desc: { 
+        bg: "images/timun_mas_full.jpg", char: "", 
+        text: "ASAL CERITA: Kisah ini berasal dari Jawa Tengah dan Jawa Timur. Menceritakan perjuangan seorang gadis melawan raksasa yang menagih janji orang tuanya.", 
+        next: "timun_mas_start" 
     },
-    scene2: {
-        bg: "images/pria_goa.png", 
-        char: "", 
-        text: "Kamu merasakan energi kuno. Sebuah suara berbisik: ‘Hanya hati murni yang bisa membantu menjaga roh di sini.’",
-        choices: [
-            { label: "Tunjukkan hatimu yang murni", go: "scene3" },
-            { label: "Aku tidak percaya bisikan itu", go: "end1" }
-        ]
+    timun_mas_start: { bg: "images/timun_mas_full1.jpg", char: "", text: "Dahulu kala, di sebuah desa, hiduplah sepasang suami istri petani yang miskin dan mendambakan anak. Suatu hari, seorang raksasa hijau muncul dan menawarkan bantuan." , next: "timun_mas_scene1" },
+    timun_mas_scene1: { bg: "images/timun_mas_full2.jpg", char: "", text: "Raksasa itu memberi mereka biji mentimun ajaib. Jika biji itu ditanam, mereka akan mendapatkan anak. Syaratnya, anak itu harus diserahkan kepada raksasa saat berusia 17 tahun.", next: "timun_mas_scene2" },
+    timun_mas_scene2: { bg: "images/timun_mas_full3.jpg", char: "", text: "Pasangan itu setuju karena rasa putus asa. Mereka menanam biji itu, dan dari mentimun terbesar, lahirlah seorang bayi perempuan yang diberi nama Timun Mas.", next: "timun_mas_scene3" },
+    timun_mas_scene3: { bg: "images/timun_mas_full4.jpg", char: "", text: "Saat Timun Mas berusia 17 tahun, raksasa datang menagih janji. Sebelum raksasa tiba, ibu Timun Mas memberinya empat bungkusan kecil: biji timun, jarum, garam, dan terasi.", next: "timun_mas_scene4" },
+    timun_mas_scene4: { bg: "images/timun_mas_full5.jpg", char: "", text: "Timun Mas melarikan diri, diikuti oleh raksasa yang marah. Ia melemparkan bungkusan pertama (biji timun), yang berubah menjadi ladang mentimun yang lebat, menahan raksasa sejenak.", next: "timun_mas_scene5" },
+    timun_mas_scene5: { bg: "images/timun_mas_full6.jpg", char: "", text: "Raksasa terus mengejar. Timun Mas melemparkan bungkusan kedua (jarum), yang berubah menjadi hutan bambu tajam. Raksasa terluka dan kesulitan melewatinya.", next: "timun_mas_scene6" },
+    timun_mas_scene6: { bg: "images/timun_mas_full7.jpg", char: "", text: "Saat raksasa hampir menangkapnya, ia melemparkan garam, menciptakan lautan lumpur yang membuat raksasa terperangkap.", next: "timun_mas_scene7" },
+    timun_mas_scene7: { bg: "images/timun_mas_full8.jpg", char: "", text: "Terakhir, ia melemparkan terasi, yang berubah menjadi lahar panas dan mendidih. Raksasa itu tercebur dan mati, dan Timun Mas pun selamat.", next: "timun_mas_end" },
+    timun_mas_end: {
+        bg: "images/timun_mas_full_end.jpg", char: "", text: "Timun Mas akhirnya kembali ke orang tuanya. Mereka hidup bahagia selamanya tanpa dihantui ancaman raksasa. (Akhir Kisah Timun Mas 💖).", next: "selection"
     },
-    scene3: {
-        bg: "images/pria_goa.png", 
-        char: "", 
-        text: "Cahaya redup muncul di dalam goa. Kamu mendengar suara berkata: ‘Terima kasih, aku percaya padamu.’",
-        choices: [
-            { label: "Kuatkan segel goa bersama", go: "end2" },
-            { label: "Aku tidak bisa membantumu", go: "end1" }
-        ]
+
+    // 2. SCENE DANAU TOBA
+    toba_title: {
+        bg: "images/toba_full.jpg", char: "", text: "✨ LEGENDA DANAU TOBA 🐟", isTitle: true, music: "audio/toba_bgm.mp3", next: "toba_desc" 
     },
-    end1: {
-        bg: "images/pria_goa.png", 
-        char: "", 
-        text: "Cahaya dalam goa memudar. Kamu memilih menjauh.\n\nENDING 1 — Kamu memilih menjauh.",
-        choices: [
-            { label: "Kembali ke Pilihan Cerita", go: "selection" } 
-        ]
+    toba_desc: { 
+        bg: "images/toba_full.jpg", char: "", 
+        text: "ASAL CERITA: Legenda yang sangat terkenal dari Sumatera Utara, menjelaskan asal usul Danau Toba dan Pulau Samosir. Cerita ini mengajarkan tentang janji yang harus ditepati.", 
+        next: "toba_start"
     },
-    end2: {
-        bg: "images/pria_goa.png", 
-        char: "", 
-        text: "Cahaya segel kembali bersinar kuat. Misteri terselesaikan.\n\nENDING 2 — Cerita berakhir bahagia.",
-        choices: [
-            { label: "Kembali ke Pilihan Cerita", go: "selection" } 
-        ]
+    toba_start: { bg: "images/toba_full1.jpg", char: "", text: "Di Sumatera Utara, hiduplah seorang petani muda bernama Toba. Suatu hari, saat memancing di sungai, ia menangkap seekor ikan mas yang besar.", next: "toba_scene1" },
+    toba_scene1: { bg: "images/toba_full2.jpg", char: "", text: "Saat Toba akan membawa pulang ikan itu, ikan mas tersebut tiba-tiba berubah menjadi seorang wanita cantik. Wanita itu adalah jelmaan dewi.", next: "toba_scene2" },
+    toba_scene2: { bg: "images/toba_full3.jpg", char: "", text: "Wanita itu setuju menikah dengan Toba, dengan satu syarat mutlak: Toba tidak boleh menceritakan asal usulnya kepada siapa pun, termasuk kepada anak mereka kelak.", next: "toba_scene3" },
+    toba_scene3: { bg: "images/toba_full4.jpg", char: "", text: "Toba menyanggupi dan mereka menikah, memiliki seorang putra bernama Samosir. Samosir tumbuh menjadi anak yang malas.", next: "toba_scene4" },
+    toba_scene4: { bg: "images/toba_full5.jpg", char: "", text: "Suatu hari, Toba marah besar karena Samosir tidak menjalankan perintahnya dan malah menghabiskan bekal makanan Toba. Dalam amarahnya, Toba berteriak: 'Dasar anak ikan!' Samosir menangis dan ibunya yang mengetahui sangat kecewa.", next: "toba_scene5" },
+    toba_scene5: { bg: "images/toba_full6.jpg", char: "", text: "Seketika akibat amarah sang istri langit menjadi mendung, dan hujan deras turun disertai gempa bumi. Air meluap dan menenggelamkan desa Toba, membentuk Danau Toba. Istri Toba kembali menjadi ikan, dan Samosir menjadi pulau di tengah danau.", next: "toba_end" },
+    toba_end: {
+        bg: "images/toba_full_end.jpg", char: "", text: "Hingga kini, Danau Toba yang indah dan Pulau Samosir menjadi pengingat abadi akan janji yang dilanggar dan konsekuensi dari amarah yang tak terkendali. (Akhir Kisah Danau Toba 🏞️).", next: "selection"
+    },
+
+    // 3. SCENE RORO JONGGRANG
+    roro_jonggrang_title: {
+        bg: "images/roro_jonggrang_desc.jpg", char: "", text:  "✨ RORO JONGGRANG 🛕", isTitle: true, music: "audio/roro_jonggrang_bgm.mp3", next: "roro_jonggrang_desc" 
+    },
+    roro_jonggrang_desc: { 
+        bg: "images/roro_jonggrang_desc.jpg", char: "", 
+        text: "ASAL CERITA: Berasal dari Jawa Tengah dan berkaitan erat dengan pembangunan Candi Prambanan. Kisah ini melibatkan kutukan dan upaya membangun seribu candi dalam semalam.", 
+        next: "roro_jonggrang_start"
+    },
+    roro_jonggrang_start: { bg: "images/roro_jonggrang_full1.jpg", char: "", text: "Bandung Bondowoso, yang sakti mandraguna, mengalahkan dan membunuh ayah Roro Jonggrang. Bandung Bondowoso kemudian berniat menikahi Roro Jonggrang.", next: "roro_jonggrang_scene1" },
+    roro_jonggrang_scene1: { bg: "images/roro_jonggrang_full2.jpg", char: "", text: "Roro Jonggrang, yang tidak mau menikah dengan pembunuh ayahnya, mengajukan syarat yang mustahil: Bandung Bondowoso harus membangun seribu candi dalam waktu satu malam.", next: "roro_jonggrang_scene2" },
+    roro_jonggrang_scene2: { bg: "images/roro_jonggrang_full3.jpg", char: "", text: "Dengan kesaktiannya, Bandung Bondowoso memanggil bantuan jin. Mereka bekerja sangat cepat, dan menjelang subuh, candi ke-999 hampir selesai.", next: "roro_jonggrang_scene3" },
+    roro_jonggrang_scene3: { bg: "images/roro_jonggrang_full4.jpg", char: "", text: "Roro Jonggrang panik. Ia memerintahkan dayang-dayang desa untuk menumbuk padi dan menyalakan obor, meniru suasana fajar.", next: "roro_jonggrang_scene4" },
+    roro_jonggrang_scene4: { bg: "images/roro_jonggrang_full5.jpg", char: "", text: "Ayam jantan berkokok karena dikira sudah pagi. Jin-jin yang membantu Bandung Bondowoso ketakutan dan melarikan diri, meninggalkan satu candi yang belum selesai.", next: "roro_jonggrang_scene5" },
+    roro_jonggrang_scene5: { bg: "images/roro_jonggrang_full6.jpg", char: "", text: "Bandung Bondowoso murka menyadari tipu daya Roro Jonggrang. Karena candi yang dibangun kurang satu, ia mengutuk Roro Jonggrang.", next: "roro_jonggrang_end" },
+    roro_jonggrang_end: {
+        bg: "images/roro_jonggrang_full_end.jpg", char: "", text: "Roro Jonggrang berubah menjadi arca batu yang melengkapi candi ke-1000. Itulah asal mula Candi Prambanan dan arca Durga di dalamnya. (Akhir Kisah Roro Jonggrang 🗿).", next: "selection"
     }
 };
 
-// --- ENGINE INTERAKTIF ---
+// --- ELEMEN DOM ---
 const introScreen = document.getElementById("intro-screen");
 const gameContainer = document.getElementById("game"); 
 const bgImg = document.getElementById("background");
@@ -284,119 +364,364 @@ const textBox = document.getElementById("text");
 const choiceBox = document.getElementById("choices");
 const fullTextBox = document.getElementById("textbox"); 
 const startButton = document.getElementById("start-button");
+const sparklesContainer = document.getElementById("sparkles");
+const transitionOverlay = document.getElementById("transition-overlay"); 
+const bgm = document.getElementById('bgm');
+const btnBgm = document.getElementById('btn-bgm');
+const btnAuto = document.getElementById('btn-auto');
+const btnStop = document.getElementById('btn-stop');
+const btnBack = document.getElementById('btn-back'); 
 
-function fadeIn(element) {
-    element.style.opacity = 0;
-    setTimeout(() => { element.style.opacity = 1; }, 50); 
+// --- VARIABEL GLOBAL ---
+let currentStoryKey = null; 
+let autoMode = false;
+let autoTimeout = null;
+let isTyping = false;
+let isMusicPlaying = false; 
+const TRANSITION_DURATION = 600; 
+// Variabel untuk fitur Fade Audio
+const MAX_VOLUME = 0.5; // Volume maksimum untuk BGM
+const FADE_DURATION = 1500; // Durasi fade dalam milidetik (1.5 detik)
+let fadeInterval = null; // Variabel untuk menyimpan interval fade
+
+// --- FUNGSI SPARKLES ---
+function makeSparkles() {
+    for (let i = 0; i < 50; i++) {
+        const star = document.createElement('span');
+        star.className = 'star';
+        star.style.left = `${Math.random() * 100}%`;
+        star.style.top = `${Math.random() * 100}%`; 
+        star.style.animationDelay = `${Math.random() * 5}s`;
+        star.style.animationDuration = `${10 + Math.random() * 5}s`;
+        sparklesContainer.appendChild(star);
+    }
+}
+function enableSparkles(enable) {
+    sparklesContainer.style.opacity = enable ? 1 : 0;
+    sparklesContainer.style.display = enable ? 'block' : 'none';
+}
+makeSparkles(); 
+
+// --- FUNGSI BGM FADE ---
+
+function fadeOutBGM(callback) {
+    if (!isMusicPlaying || bgm.volume === 0) {
+        if (callback) callback();
+        return;
+    }
+    
+    clearInterval(fadeInterval);
+    const steps = 50; 
+    const stepDuration = FADE_DURATION / steps;
+    const volumeStep = bgm.volume / steps;
+
+    fadeInterval = setInterval(() => {
+        if (bgm.volume > volumeStep) {
+            bgm.volume -= volumeStep;
+        } else {
+            bgm.volume = 0;
+            bgm.pause();
+            clearInterval(fadeInterval);
+            isMusicPlaying = false;
+            btnBgm.innerText = '🎵 Musik';
+            if (callback) callback();
+        }
+    }, stepDuration);
 }
 
-// FIX: Mengubah tujuan startButton ke halaman seleksi
+function fadeInBGM() {
+    bgm.volume = 0;
+    bgm.play().then(() => {
+        isMusicPlaying = true;
+        btnBgm.innerText = '🔇 Musik';
+        
+        clearInterval(fadeInterval);
+        const steps = 50; 
+        const stepDuration = FADE_DURATION / steps;
+        const volumeStep = MAX_VOLUME / steps;
+
+        fadeInterval = setInterval(() => {
+            if (bgm.volume < MAX_VOLUME - volumeStep) {
+                bgm.volume += volumeStep;
+            } else {
+                bgm.volume = MAX_VOLUME;
+                clearInterval(fadeInterval);
+            }
+        }, stepDuration);
+    }).catch(e => {
+        console.log("BGM Playback Failed. Must be triggered by user interaction.", e);
+        isMusicPlaying = false;
+        btnBgm.innerText = '🎵 Musik';
+    });
+}
+
+
+// --- FUNGSI BGM (MODIFIKASI) ---
+function playBGM(newMusicPath) {
+    // Cek apakah musik yang baru sama dengan yang sedang diputar
+    if (bgm.src.indexOf(newMusicPath) !== -1 && isMusicPlaying) {
+        return; // Tidak perlu ganti jika musiknya sama
+    }
+    
+    // 1. Matikan musik lama dengan fade out
+    fadeOutBGM(() => {
+        // 2. Setelah fade out selesai, atur sumber musik baru
+        if (bgm.src.indexOf(newMusicPath) === -1) {
+            bgm.src = newMusicPath;
+            bgm.load();
+        }
+        
+        // 3. Putar dan lakukan fade in
+        fadeInBGM();
+    });
+}
+
+
+// --- FUNGSI TYPEWRITER ---
+function typeText(str, done) {
+    isTyping = true;
+    textBox.innerHTML = '';
+    let i = 0;
+    let speed = 40; 
+    
+    choiceBox.style.opacity = 0; 
+    choiceBox.innerHTML = ""; 
+
+    function t() {
+        if (i < str.length) {
+            textBox.innerHTML += str[i++];
+            if (isTyping) { 
+                setTimeout(t, speed);
+            }
+        } else {
+            isTyping = false;
+            if (done) done();
+        }
+    }
+    t();
+}
+
+function autoDelay(t) { 
+    return t.length < 80 ? 2500 : t.length < 150 ? 4500 : 7000; 
+}
+
+
+// --- FUNGSI KRITIS: TRANSISI FADE ---
+function startTransition(callback) {
+    transitionOverlay.style.pointerEvents = 'auto'; 
+    transitionOverlay.style.opacity = 1;
+
+    setTimeout(() => {
+        callback(); 
+        
+        setTimeout(() => {
+            transitionOverlay.style.opacity = 0;
+            transitionOverlay.style.pointerEvents = 'none'; 
+        }, 50); 
+
+    }, TRANSITION_DURATION); 
+}
+
+// Aksi tombol Start di Intro (MODIFIKASI)
 startButton.onclick = () => {
     introScreen.style.opacity = 0; 
+    
+    // Inisialisasi musik dan Fade In pertama kali
+    bgm.src = DEFAULT_BGM;
+    bgm.load();
+    fadeInBGM(); 
+
     setTimeout(() => {
         introScreen.style.display = 'none'; 
         gameContainer.style.opacity = 1; 
-        loadScene("selection"); // Langsung ke halaman seleksi
+        
+        loadScene("selection"); 
     }, 1000); 
 };
 
 
+// --- FUNGSI UTAMA: loadScene dengan Transisi ---
 function loadScene(key) {
     const sc = scenes[key];
     if(!sc) return;
 
-    // 1. Matikan elemen lama
-    bgImg.style.opacity = 0;
-    fullTextBox.style.opacity = 0;
-    
-    choiceBox.innerHTML = "";
-    textBox.innerText = "";
-    
-    // Reset Class
-    fullTextBox.classList.remove('story-title-box');
-    
-    // FIX KRUSIAL (Bersihkan Elemen Dinamis): Hapus selection-wrapper jika ada
-    const existingWrapper = document.getElementById('selection-wrapper');
-    if (existingWrapper) {
-        gameContainer.removeChild(existingWrapper);
-    }
-    
-    // Hapus kelas layout seleksi jika ada
-    gameContainer.classList.remove('selection-layout');
+    startTransition(() => {
+        // GANTI MUSIK JIKA ADA PERUBAHAN DI SCENE BARU (MENGGUNAKAN playBGM yang sudah dimodifikasi)
+        if (sc.music) { playBGM(sc.music); }
 
-    // Pastikan textbox terlihat (kecuali di seleksi)
-    fullTextBox.style.display = 'block';
-
-    // --- LOGIC BARU UNTUK HALAMAN SELEKSI (THUMBNAIL INTERAKTIF) ---
-    if (sc.isSelection) {
-        fullTextBox.style.display = 'none'; 
+        clearTimeout(autoTimeout);
+        currentStoryKey = key; 
         
-        // Tambahkan class untuk penataan halaman seleksi
-        gameContainer.classList.add('selection-layout');
+        // --- CLEAN UP TAMPILAN ---
+        fullTextBox.style.opacity = 0; 
+        choiceBox.innerHTML = "";
+        textBox.innerText = "";
+        // Pastikan kelas judul dihapus/ditambahkan dengan benar
+        fullTextBox.classList.remove('story-title-box'); 
         
-        // 2. Buat kontainer untuk konten seleksi
-        const selectionContent = document.createElement('div');
-        selectionContent.id = 'selection-wrapper';
-        selectionContent.innerHTML = `<h2 id="selection-title">${sc.text}</h2><div id="selection-choices"></div>`;
-        gameContainer.appendChild(selectionContent); // Tambahkan wrapper
-
-        const selectionChoices = document.getElementById("selection-choices");
+        const existingWrapper = document.getElementById('selection-wrapper');
+        if (existingWrapper) { gameContainer.removeChild(existingWrapper); }
         
-        // Muat gambar background
-        setTimeout(() => {
-            bgImg.src = sc.bg; 
-            fadeIn(bgImg);
-        }, 500); 
+        gameContainer.classList.remove('selection-layout');
+        fullTextBox.style.display = 'block';
 
-        // Buat pilihan menggunakan thumbnail
-        sc.choices.forEach(c => {
-            const div = document.createElement("div");
-            div.className = "thumbnail-choice"; 
+        // --- LOGIC HALAMAN SELEKSI (MENU UTAMA) ---
+        if (sc.isSelection) {
+            fullTextBox.style.display = 'none'; 
+            btnBack.style.display = 'none'; 
+            enableSparkles(true); 
             
-            // Tambahkan gambar dan label
-            div.innerHTML = `<img src="${c.thumbnail}" alt="${c.label}"> <p>${c.label}</p>`;
+            gameContainer.classList.add('selection-layout');
+            
+            const selectionContent = document.createElement('div');
+            selectionContent.id = 'selection-wrapper';
+            selectionContent.innerHTML = `
+                <h2 id="selection-title">${sc.text}</h2>
+                <p id="tutorial-text">Tekan SPASI/ENTER untuk lanjut dalam cerita linier. Gunakan tombol 'Auto' untuk membaca otomatis.</p>
+                <div id="selection-choices"></div>`;
+            gameContainer.appendChild(selectionContent);
 
-            div.onclick = () => {
-                // Saat diklik, hapus selection-wrapper secara eksplisit
-                const wrapper = document.getElementById('selection-wrapper');
-                if (wrapper) {
-                    gameContainer.removeChild(wrapper);
-                }
-                loadScene(c.go);
-            };
-            selectionChoices.appendChild(div);
-        });
+            const selectionChoices = document.getElementById("selection-choices");
+            bgImg.src = sc.bg; 
+            
+            setTimeout(() => {
+                bgImg.style.opacity = 1; 
+                charImg.style.display = 'none';
+            }, 50); 
 
-        return; 
-    } 
-    
-    // --- LOGIC STANDARD UNTUK SCENE CERITA ---
+            sc.choices.forEach(c => {
+                const div = document.createElement("div");
+                div.className = "thumbnail-choice"; 
+                div.innerHTML = `<img src="${c.thumbnail}" alt="${c.label}" onerror="this.onerror=null;this.src='images/placeholder.png';"> <p>${c.label}</p>`;
+                div.onclick = () => {
+                    loadScene(c.go); 
+                };
+                selectionChoices.appendChild(div);
+            });
+            return; 
+        } 
+        
+        // --- LOGIC STANDARD UNTUK SCENE CERITA LINIER ---
+        btnBack.style.display = 'block'; 
+        enableSparkles(false); 
+        charImg.style.display = 'block';
 
-    if (sc.isTitle) {
-        fullTextBox.classList.add('story-title-box');
-    }
-    
-    // 2. Muat gambar baru dan teks 
-    setTimeout(() => {
+        // Jika ini adalah scene Judul Cerita, gunakan kotak teks besar di tengah
+        if (sc.isTitle) {
+            fullTextBox.classList.add('story-title-box');
+        }
+        // Jika ini scene Deskripsi atau Scene cerita biasa, hapus kelas judul
+        else {
+            fullTextBox.classList.remove('story-title-box');
+        }
+        
         bgImg.src = sc.bg; 
         charImg.src = sc.char; 
-        textBox.innerText = sc.text;
+        
+        setTimeout(() => {
+            bgImg.style.opacity = 1; 
+            fullTextBox.style.opacity = 1;
+            
+            typeText(sc.text, () => {
+                if (autoMode) {
+                    clearTimeout(autoTimeout);
+                    autoTimeout = setTimeout(nextScene, autoDelay(sc.text));
+                }
+            });
+        }, 50); 
 
-        // 3. Fade In elemen baru
-        fadeIn(bgImg);
-        fadeIn(fullTextBox);
-
-        // 4. Buat pilihan
-        sc.choices.forEach(c => {
-            const btn = document.createElement("button");
-            btn.innerText = c.label;
-            btn.className = "choice-button"; 
-            btn.onclick = () => loadScene(c.go);
-            choiceBox.appendChild(btn);
-        });
-
-    }, 500); 
+    }); 
 }
+
+// --- FUNGSI NEXT SCENE ---
+function nextScene() {
+    if (isTyping) {
+        isTyping = false;
+        textBox.innerText = scenes[currentStoryKey].text;
+        if (autoMode) {
+            clearTimeout(autoTimeout);
+            autoTimeout = setTimeout(nextScene, autoDelay(scenes[currentStoryKey].text));
+        }
+        return;
+    } 
+
+    const currentScene = scenes[currentStoryKey];
+    const nextKey = currentScene.next; 
+
+    if (nextKey && scenes[nextKey]) {
+        // Sebelum pindah ke scene berikutnya, pastikan Judul dihapus jika scene berikutnya bukan Judul
+        if (scenes[currentStoryKey].isTitle && scenes[nextKey].next !== 'timun_mas_start' && scenes[nextKey].next !== 'toba_start' && scenes[nextKey].next !== 'roro_jonggrang_start') {
+             fullTextBox.classList.remove('story-title-box');
+        }
+        loadScene(nextKey);
+    } else {
+        fullTextBox.style.opacity = 0;
+        startTransition(() => {
+            // Fade out BGM saat cerita berakhir
+            fadeOutBGM(); 
+            
+            bgImg.src = scenes['selection'].bg; 
+            bgImg.style.opacity = 1;
+            fullTextBox.style.opacity = 1;
+
+            const endText = '✨ Tamat. Kisah berakhir. ✨';
+            typeText(endText, () => {
+                autoMode = false;
+                clearTimeout(autoTimeout);
+                setTimeout(() => loadScene('selection'), 4000); 
+            });
+        });
+    }
+}
+
+
+// --- EVENT LISTENER TOMBOL KONTROL (MODIFIKASI BGM) ---
+btnBgm.onclick = () => { 
+    if (bgm.paused || !isMusicPlaying) {
+        // Jika paused/stop, lakukan fade in
+        fadeInBGM();
+    } else {
+        // Jika sedang putar, lakukan fade out
+        fadeOutBGM();
+    }
+};
+
+btnAuto.onclick = () => { 
+    if (autoMode) {
+        autoMode = false;
+        clearTimeout(autoTimeout);
+        btnAuto.innerText = '▶ Auto';
+        btnStop.innerText = '⏸ Stop';
+    } else {
+        autoMode = true;
+        btnAuto.innerText = '⏳ Auto ON';
+        btnStop.innerText = '⏸ Stop';
+        if (!isTyping) { nextScene(); }
+    }
+};
+
+btnStop.onclick = () => { 
+    autoMode = false;
+    clearTimeout(autoTimeout);
+    btnStop.innerText = '✅ Stop OFF';
+    btnAuto.innerText = '▶ Auto';
+};
+
+btnBack.onclick = () => {
+    autoMode = false;
+    clearTimeout(autoTimeout);
+    loadScene('selection');
+};
+
+document.addEventListener('keydown', e => { 
+    if (e.key === ' ' || e.key === 'Enter') {
+        e.preventDefault();
+        // Hanya panggil nextScene jika transisi overlay sedang tidak aktif
+        if (transitionOverlay.style.opacity === '0' || transitionOverlay.style.opacity === '') {
+            nextScene(); 
+        }
+    }
+});
 </script>
 
 </body>
