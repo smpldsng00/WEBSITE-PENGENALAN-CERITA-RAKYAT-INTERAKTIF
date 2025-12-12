@@ -64,11 +64,9 @@
         z-index: 1; 
     }
     
-    /* MODIFIKASI KRITIS: object-fit: contain */
     #background, #character {
         position: absolute; inset: 0; width: 100%; height: 100%; 
-        object-fit: contain; /* DIGANTI DARI 'cover' MENJADI 'contain' */
-        background-color: black; /* Penting agar ruang kosong diisi warna hitam */
+        object-fit: cover;
     }
 
     #background {
@@ -478,7 +476,7 @@ function makeSparkles() {
 }
 function enableSparkles(enable) {
     sparklesContainer.style.opacity = enable ? 1 : 0;
-    sparklesContainer.style.display = enable ? 'block' : 'none';
+    // sparklesContainer.style.display = enable ? 'block' : 'none'; // Dihapus karena opacity sudah mengontrol tampilan
 }
 makeSparkles(); 
 
@@ -511,6 +509,7 @@ function fadeOutBGM(callback) {
 
 function fadeInBGM() {
     bgm.volume = 0;
+    // Menggunakan play() dalam try-catch untuk menangani batasan browser (seperti di seluler)
     bgm.play().then(() => {
         isMusicPlaying = true;
         btnBgm.innerText = '🔇 Musik';
@@ -529,7 +528,7 @@ function fadeInBGM() {
             }
         }, stepDuration);
     }).catch(e => {
-        console.log("BGM Playback Failed. Must be triggered by user interaction.", e);
+        console.warn("BGM Playback Failed. Must be triggered by user interaction or restriction applied.", e);
         isMusicPlaying = false;
         btnBgm.innerText = '🎵 Musik';
     });
@@ -606,7 +605,7 @@ function startTransition(callback) {
 startButton.onclick = () => {
     introScreen.style.opacity = 0; 
     
-    // Inisialisasi musik dan Fade In pertama kali
+    // Inisialisasi musik dan Fade In pertama kali (Dipicu oleh interaksi pengguna)
     bgm.src = DEFAULT_BGM;
     bgm.load();
     fadeInBGM(); 
@@ -626,7 +625,7 @@ function loadScene(key) {
     if(!sc) return;
 
     startTransition(() => {
-        // GANTI MUSIK JIKA ADA PERUBAHAN DI SCENE BARU (MENGGUNAKAN playBGM yang sudah dimodifikasi)
+        // GANTI MUSIK JIKA ADA PERUBAHAN DI SCENE BARU 
         if (sc.music) { playBGM(sc.music); }
 
         clearTimeout(autoTimeout);
@@ -636,7 +635,7 @@ function loadScene(key) {
         fullTextBox.style.opacity = 0; 
         choiceBox.innerHTML = "";
         textBox.innerText = "";
-        // Pastikan kelas judul dihapus/ditambahkan dengan benar
+        
         fullTextBox.classList.remove('story-title-box'); 
         
         const existingWrapper = document.getElementById('selection-wrapper');
@@ -657,7 +656,7 @@ function loadScene(key) {
             selectionContent.id = 'selection-wrapper';
             selectionContent.innerHTML = `
                 <h2 id="selection-title">${sc.text}</h2>
-                <p id="tutorial-text">Tekan SPASI/ENTER atau klik/sentuh layar untuk lanjut dalam cerita linier. Gunakan tombol 'Auto' untuk membaca otomatis.</p>
+                <p id="tutorial-text">Klik atau sentuh layar untuk melanjutkan cerita linier. Gunakan tombol 'Auto' untuk membaca otomatis.</p>
                 <div id="selection-choices"></div>`;
             gameContainer.appendChild(selectionContent);
 
@@ -690,10 +689,6 @@ function loadScene(key) {
         if (sc.isTitle) {
             fullTextBox.classList.add('story-title-box');
         }
-        // Jika ini scene Deskripsi atau Scene cerita biasa, hapus kelas judul
-        else {
-            fullTextBox.classList.remove('story-title-box');
-        }
         
         bgImg.src = sc.bg; 
         charImg.src = sc.char; 
@@ -710,12 +705,13 @@ function loadScene(key) {
             });
         }, 50); 
 
-    });
+    }); 
 }
 
 // --- FUNGSI NEXT SCENE ---
 function nextScene() {
     if (isTyping) {
+        // Lewati proses mengetik jika pengguna menekan tombol (atau klik/sentuh)
         isTyping = false;
         textBox.innerText = scenes[currentStoryKey].text;
         if (autoMode) {
@@ -735,6 +731,7 @@ function nextScene() {
         }
         loadScene(nextKey);
     } else {
+        // Akhir Cerita
         fullTextBox.style.opacity = 0;
         startTransition(() => {
             // Fade out BGM saat cerita berakhir
@@ -793,6 +790,7 @@ btnBack.onclick = () => {
     loadScene('selection');
 };
 
+// --- EVENT LISTENER UNTUK LANJUT SCENE (Keyboard) ---
 document.addEventListener('keydown', e => { 
     if (e.key === ' ' || e.key === 'Enter') {
         e.preventDefault();
