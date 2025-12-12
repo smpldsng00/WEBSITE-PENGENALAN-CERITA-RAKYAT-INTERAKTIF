@@ -64,9 +64,11 @@
         z-index: 1; 
     }
     
+    /* FIX KRITIS 1: object-fit: cover (memastikan foto mengisi penuh layar) */
     #background, #character {
         position: absolute; inset: 0; width: 100%; height: 100%; 
-        object-fit: cover;
+        object-fit: cover; /* PERUBAHAN DI SINI */
+        background-color: black; 
     }
 
     #background {
@@ -80,7 +82,8 @@
     }
 
     #textbox {
-        position:absolute; bottom:0; width:100%; background:rgba(0,0,0,0.7);
+        position:absolute; bottom:0; width:100%; 
+        background:rgba(0,0,0,0.7);
         padding:20px; box-sizing:border-box;
         z-index: 20;
         opacity:0; transition: opacity .5s;
@@ -261,15 +264,16 @@
             font-size: 1.1rem;
         }
         
-        /* Penyesuaian Textbox (Kotak Dialog) */
+        /* FIX KRITIS 2: Penyesuaian Textbox (Kotak Dialog) */
         #textbox {
-            padding: 10px; 
-            max-height: 40vh; 
+            padding: 8px; 
+            max-height: 25vh; 
             overflow-y: auto; 
+            background:rgba(0,0,0,0.7); 
         }
         #text {
-            font-size: 1.1rem; 
-            min-height: 3em; 
+            font-size: 1.0rem; 
+            min-height: 2em; 
         }
 
         /* Penyesuaian Tombol Kontrol */
@@ -408,7 +412,8 @@ const scenes = {
     toba_scene2: { bg: "images/toba_full3.jpg", char: "", text: "Wanita itu setuju menikah dengan Toba, dengan satu syarat mutlak: Toba tidak boleh menceritakan asal usulnya kepada siapa pun, termasuk kepada anak mereka kelak.", next: "toba_scene3" },
     toba_scene3: { bg: "images/toba_full4.jpg", char: "", text: "Toba menyanggupi dan mereka menikah, memiliki seorang putra bernama Samosir. Samosir tumbuh menjadi anak yang malas.", next: "toba_scene4" },
     toba_scene4: { bg: "images/toba_full5.jpg", char: "", text: "Suatu hari, Toba marah besar karena Samosir tidak menjalankan perintahnya dan malah menghabiskan bekal makanan Toba. Dalam amarahnya, Toba berteriak: 'Dasar anak ikan!' Samosir menangis dan ibunya yang mengetahui sangat kecewa.", next: "toba_scene5" },
-    toba_scene5: { bg: "images/toba_full6.jpg", char: "", text: "Seketika akibat amarah sang istri langit menjadi mendung, dan hujan deras turun disertai gempa bumi. Air meluap dan menenggelamkan desa Toba, membentuk Danau Toba. Istri Toba kembali menjadi ikan, dan Samosir menjadi pulau di tengah danau.", next: "toba_end" },
+    toba_scene5: { bg: "images/toba_full6.jpg", char: "", text: "Seketika akibat amarah sang istri langit menjadi mendung, dan hujan deras turun disertai gempa bumi. Air meluap dan menenggelamkan desa Toba, membentuk Danau Toba. Istri Toba kembali menjadi ikan, dan Samosir menjadi pulau di tengah danau.", next: "toba_scene5" },
+    toba_scene5: { bg: "images/toba_full7.jpg", char: "", text: "Seketika akibat amarah sang istri langit menjadi mendung, dan hujan deras turun disertai gempa bumi. Air meluap dan menenggelamkan desa Toba, membentuk Danau Toba. Istri Toba kembali menjadi ikan, dan Samosir menjadi pulau di tengah danau.", next: "toba_end" },
     toba_end: {
         bg: "images/toba_full_end.jpg", char: "", text: "Hingga kini, Danau Toba yang indah dan Pulau Samosir menjadi pengingat abadi akan janji yang dilanggar dan konsekuensi dari amarah yang tak terkendali. (Akhir Kisah Danau Toba 🏞️).", next: "selection"
     },
@@ -476,7 +481,6 @@ function makeSparkles() {
 }
 function enableSparkles(enable) {
     sparklesContainer.style.opacity = enable ? 1 : 0;
-    // sparklesContainer.style.display = enable ? 'block' : 'none'; // Dihapus karena opacity sudah mengontrol tampilan
 }
 makeSparkles(); 
 
@@ -509,7 +513,6 @@ function fadeOutBGM(callback) {
 
 function fadeInBGM() {
     bgm.volume = 0;
-    // Menggunakan play() dalam try-catch untuk menangani batasan browser (seperti di seluler)
     bgm.play().then(() => {
         isMusicPlaying = true;
         btnBgm.innerText = '🔇 Musik';
@@ -537,20 +540,16 @@ function fadeInBGM() {
 
 // --- FUNGSI BGM (MODIFIKASI) ---
 function playBGM(newMusicPath) {
-    // Cek apakah musik yang baru sama dengan yang sedang diputar
     if (bgm.src.indexOf(newMusicPath) !== -1 && isMusicPlaying) {
-        return; // Tidak perlu ganti jika musiknya sama
+        return; 
     }
     
-    // 1. Matikan musik lama dengan fade out
     fadeOutBGM(() => {
-        // 2. Setelah fade out selesai, atur sumber musik baru
         if (bgm.src.indexOf(newMusicPath) === -1) {
             bgm.src = newMusicPath;
             bgm.load();
         }
         
-        // 3. Putar dan lakukan fade in
         fadeInBGM();
     });
 }
@@ -605,7 +604,6 @@ function startTransition(callback) {
 startButton.onclick = () => {
     introScreen.style.opacity = 0; 
     
-    // Inisialisasi musik dan Fade In pertama kali (Dipicu oleh interaksi pengguna)
     bgm.src = DEFAULT_BGM;
     bgm.load();
     fadeInBGM(); 
@@ -625,7 +623,6 @@ function loadScene(key) {
     if(!sc) return;
 
     startTransition(() => {
-        // GANTI MUSIK JIKA ADA PERUBAHAN DI SCENE BARU 
         if (sc.music) { playBGM(sc.music); }
 
         clearTimeout(autoTimeout);
@@ -683,15 +680,16 @@ function loadScene(key) {
         // --- LOGIC STANDARD UNTUK SCENE CERITA LINIER ---
         btnBack.style.display = 'block'; 
         enableSparkles(false); 
-        charImg.style.display = 'block';
+        
+        // FIX KRITIS 3: Sembunyikan karakter karena sumber gambar (sc.char) selalu kosong.
+        charImg.style.display = 'none'; 
+        charImg.src = sc.char; 
 
-        // Jika ini adalah scene Judul Cerita, gunakan kotak teks besar di tengah
         if (sc.isTitle) {
             fullTextBox.classList.add('story-title-box');
         }
         
         bgImg.src = sc.bg; 
-        charImg.src = sc.char; 
         
         setTimeout(() => {
             bgImg.style.opacity = 1; 
@@ -725,16 +723,13 @@ function nextScene() {
     const nextKey = currentScene.next; 
 
     if (nextKey && scenes[nextKey]) {
-        // Sebelum pindah ke scene berikutnya, pastikan Judul dihapus jika scene berikutnya bukan Judul
         if (scenes[currentStoryKey].isTitle && scenes[nextKey].next !== 'timun_mas_start' && scenes[nextKey].next !== 'toba_start' && scenes[nextKey].next !== 'roro_jonggrang_start') {
              fullTextBox.classList.remove('story-title-box');
         }
         loadScene(nextKey);
     } else {
-        // Akhir Cerita
         fullTextBox.style.opacity = 0;
         startTransition(() => {
-            // Fade out BGM saat cerita berakhir
             fadeOutBGM(); 
             
             bgImg.src = scenes['selection'].bg; 
@@ -755,10 +750,8 @@ function nextScene() {
 // --- EVENT LISTENER TOMBOL KONTROL (MODIFIKASI BGM) ---
 btnBgm.onclick = () => { 
     if (bgm.paused || !isMusicPlaying) {
-        // Jika paused/stop, lakukan fade in
         fadeInBGM();
     } else {
-        // Jika sedang putar, lakukan fade out
         fadeOutBGM();
     }
 };
@@ -790,11 +783,9 @@ btnBack.onclick = () => {
     loadScene('selection');
 };
 
-// --- EVENT LISTENER UNTUK LANJUT SCENE (Keyboard) ---
 document.addEventListener('keydown', e => { 
     if (e.key === ' ' || e.key === 'Enter') {
         e.preventDefault();
-        // Hanya panggil nextScene jika transisi overlay sedang tidak aktif
         if (transitionOverlay.style.opacity === '0' || transitionOverlay.style.opacity === '') {
             nextScene(); 
         }
@@ -803,13 +794,10 @@ document.addEventListener('keydown', e => {
 
 // --- EVENT LISTENER UNTUK LANJUT SCENE (Click/Touch - Penting untuk Mobile) ---
 document.addEventListener('click', e => {
-    // Abaikan klik pada tombol kontrol atau pilihan
     if (e.target.closest('.fairy-btn') || e.target.closest('.thumbnail-choice') || e.target.closest('#start-button')) {
         return; 
     }
-    // Hanya panggil nextScene jika transisi overlay sedang tidak aktif dan gameContainer terlihat
     if (gameContainer.style.opacity === '1' && (transitionOverlay.style.opacity === '0' || transitionOverlay.style.opacity === '')) {
-        // Jika sedang di layar seleksi, jangan lakukan apa-apa
         if (scenes[currentStoryKey] && scenes[currentStoryKey].isSelection) {
             return;
         }
