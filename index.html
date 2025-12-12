@@ -67,7 +67,7 @@
     /* FIX KRITIS 1: object-fit: cover (memastikan foto mengisi penuh layar) */
     #background, #character {
         position: absolute; inset: 0; width: 100%; height: 100%; 
-        object-fit: cover; /* PERUBAHAN DI SINI */
+        object-fit: cover; 
         background-color: black; 
     }
 
@@ -412,8 +412,7 @@ const scenes = {
     toba_scene2: { bg: "images/toba_full3.jpg", char: "", text: "Wanita itu setuju menikah dengan Toba, dengan satu syarat mutlak: Toba tidak boleh menceritakan asal usulnya kepada siapa pun, termasuk kepada anak mereka kelak.", next: "toba_scene3" },
     toba_scene3: { bg: "images/toba_full4.jpg", char: "", text: "Toba menyanggupi dan mereka menikah, memiliki seorang putra bernama Samosir. Samosir tumbuh menjadi anak yang malas.", next: "toba_scene4" },
     toba_scene4: { bg: "images/toba_full5.jpg", char: "", text: "Suatu hari, Toba marah besar karena Samosir tidak menjalankan perintahnya dan malah menghabiskan bekal makanan Toba. Dalam amarahnya, Toba berteriak: 'Dasar anak ikan!' Samosir menangis dan ibunya yang mengetahui sangat kecewa.", next: "toba_scene5" },
-    toba_scene5: { bg: "images/toba_full6.jpg", char: "", text: "Seketika akibat amarah sang istri langit menjadi mendung, dan hujan deras turun disertai gempa bumi. Air meluap dan menenggelamkan desa Toba, membentuk Danau Toba. Istri Toba kembali menjadi ikan, dan Samosir menjadi pulau di tengah danau.", next: "toba_scene5" },
-    toba_scene5: { bg: "images/toba_full7.jpg", char: "", text: "Seketika akibat amarah sang istri langit menjadi mendung, dan hujan deras turun disertai gempa bumi. Air meluap dan menenggelamkan desa Toba, membentuk Danau Toba. Istri Toba kembali menjadi ikan, dan Samosir menjadi pulau di tengah danau.", next: "toba_end" },
+    toba_scene5: { bg: "images/toba_full6.jpg", char: "", text: "Seketika akibat amarah sang istri langit menjadi mendung, dan hujan deras turun disertai gempa bumi. Air meluap dan menenggelamkan desa Toba, membentuk Danau Toba. Istri Toba kembali menjadi ikan, dan Samosir menjadi pulau di tengah danau.", next: "toba_end" },
     toba_end: {
         bg: "images/toba_full_end.jpg", char: "", text: "Hingga kini, Danau Toba yang indah dan Pulau Samosir menjadi pengingat abadi akan janji yang dilanggar dan konsekuensi dari amarah yang tak terkendali. (Akhir Kisah Danau Toba 🏞️).", next: "selection"
     },
@@ -617,7 +616,7 @@ startButton.onclick = () => {
 };
 
 
-// --- FUNGSI UTAMA: loadScene dengan Transisi ---
+// --- FUNGSI UTAMA: loadScene dengan Transisi (TERMASUK PERUBAHAN) ---
 function loadScene(key) {
     const sc = scenes[key];
     if(!sc) return;
@@ -653,7 +652,11 @@ function loadScene(key) {
             selectionContent.id = 'selection-wrapper';
             selectionContent.innerHTML = `
                 <h2 id="selection-title">${sc.text}</h2>
-                <p id="tutorial-text">Klik atau sentuh layar untuk melanjutkan cerita linier. Gunakan tombol 'Auto' untuk membaca otomatis.</p>
+                <p id="tutorial-text">
+                    (📱 TIPS: Disarankan bagi yang menggunakan HP memiringkan layar (Landscape) untuk tampilan cerita yang lebih bagus.)
+                    <br><br>
+                    Klik atau sentuh layar untuk melanjutkan cerita linier. Gunakan tombol 'Auto' untuk membaca otomatis.
+                </p>
                 <div id="selection-choices"></div>`;
             gameContainer.appendChild(selectionContent);
 
@@ -681,7 +684,7 @@ function loadScene(key) {
         btnBack.style.display = 'block'; 
         enableSparkles(false); 
         
-        // FIX KRITIS 3: Sembunyikan karakter karena sumber gambar (sc.char) selalu kosong.
+        // Sembunyikan karakter
         charImg.style.display = 'none'; 
         charImg.src = sc.char; 
 
