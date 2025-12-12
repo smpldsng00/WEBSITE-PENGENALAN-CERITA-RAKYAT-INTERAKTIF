@@ -243,6 +243,84 @@
         50% { opacity: 0.8; }
         100% { transform: translateY(-100vh) rotate(180deg); opacity: 0; }
     }
+
+    /* ----------------------------------
+       GAYA UNTUK PERANGKAT SELULER (MEDIA QUERIES)
+    ----------------------------------- */
+    @media (max-width: 768px) {
+        /* Penyesuaian Font dan Teks Intro */
+        #intro-screen h1 {
+            font-size: 1.8rem; 
+        }
+        #intro-screen p {
+            font-size: 1em;
+            margin-bottom: 20px;
+        }
+        #start-button {
+            padding: 12px 30px;
+            font-size: 1.1rem;
+        }
+        
+        /* Penyesuaian Textbox (Kotak Dialog) */
+        #textbox {
+            padding: 10px; 
+            max-height: 40vh; 
+            overflow-y: auto; 
+        }
+        #text {
+            font-size: 1.1rem; 
+            min-height: 3em; 
+        }
+
+        /* Penyesuaian Tombol Kontrol */
+        .controls {
+            top: 10px; 
+            right: 10px;
+            flex-direction: row; 
+            gap: 5px;
+            z-index: 501; 
+        }
+        .fairy-btn {
+            padding: 8px 15px; 
+            font-size: 0.8rem; 
+            border-radius: 8px;
+        }
+        
+        /* Penyesuaian Layar Seleksi */
+        .selection-layout h2 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+        #tutorial-text {
+            font-size: 0.9em;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        #selection-choices {
+            gap: 15px; 
+            padding: 0 10px;
+        }
+        .thumbnail-choice {
+            width: 150px; 
+        }
+        .thumbnail-choice img {
+            height: 100px; 
+        }
+        .thumbnail-choice p {
+            font-size: 1em;
+            min-height: 30px; 
+        }
+        
+        /* Penyesuaian Judul Cerita */
+        #textbox.story-title-box {
+            width: 90%; 
+            left: 5%; 
+            padding: 20px;
+        }
+        #textbox.story-title-box #text {
+            font-size: 1.5em;
+        }
+    }
 </style>
 </head>
 <body>
@@ -398,7 +476,7 @@ function makeSparkles() {
 }
 function enableSparkles(enable) {
     sparklesContainer.style.opacity = enable ? 1 : 0;
-    sparklesContainer.style.display = enable ? 'block' : 'none';
+    // sparklesContainer.style.display = enable ? 'block' : 'none'; // Dihapus karena opacity sudah mengontrol tampilan
 }
 makeSparkles(); 
 
@@ -431,6 +509,7 @@ function fadeOutBGM(callback) {
 
 function fadeInBGM() {
     bgm.volume = 0;
+    // Menggunakan play() dalam try-catch untuk menangani batasan browser (seperti di seluler)
     bgm.play().then(() => {
         isMusicPlaying = true;
         btnBgm.innerText = '🔇 Musik';
@@ -449,7 +528,7 @@ function fadeInBGM() {
             }
         }, stepDuration);
     }).catch(e => {
-        console.log("BGM Playback Failed. Must be triggered by user interaction.", e);
+        console.warn("BGM Playback Failed. Must be triggered by user interaction or restriction applied.", e);
         isMusicPlaying = false;
         btnBgm.innerText = '🎵 Musik';
     });
@@ -526,7 +605,7 @@ function startTransition(callback) {
 startButton.onclick = () => {
     introScreen.style.opacity = 0; 
     
-    // Inisialisasi musik dan Fade In pertama kali
+    // Inisialisasi musik dan Fade In pertama kali (Dipicu oleh interaksi pengguna)
     bgm.src = DEFAULT_BGM;
     bgm.load();
     fadeInBGM(); 
@@ -546,7 +625,7 @@ function loadScene(key) {
     if(!sc) return;
 
     startTransition(() => {
-        // GANTI MUSIK JIKA ADA PERUBAHAN DI SCENE BARU (MENGGUNAKAN playBGM yang sudah dimodifikasi)
+        // GANTI MUSIK JIKA ADA PERUBAHAN DI SCENE BARU 
         if (sc.music) { playBGM(sc.music); }
 
         clearTimeout(autoTimeout);
@@ -556,7 +635,7 @@ function loadScene(key) {
         fullTextBox.style.opacity = 0; 
         choiceBox.innerHTML = "";
         textBox.innerText = "";
-        // Pastikan kelas judul dihapus/ditambahkan dengan benar
+        
         fullTextBox.classList.remove('story-title-box'); 
         
         const existingWrapper = document.getElementById('selection-wrapper');
@@ -577,7 +656,7 @@ function loadScene(key) {
             selectionContent.id = 'selection-wrapper';
             selectionContent.innerHTML = `
                 <h2 id="selection-title">${sc.text}</h2>
-                <p id="tutorial-text">Tekan SPASI/ENTER untuk lanjut dalam cerita linier. Gunakan tombol 'Auto' untuk membaca otomatis.</p>
+                <p id="tutorial-text">Klik atau sentuh layar untuk melanjutkan cerita linier. Gunakan tombol 'Auto' untuk membaca otomatis.</p>
                 <div id="selection-choices"></div>`;
             gameContainer.appendChild(selectionContent);
 
@@ -610,10 +689,6 @@ function loadScene(key) {
         if (sc.isTitle) {
             fullTextBox.classList.add('story-title-box');
         }
-        // Jika ini scene Deskripsi atau Scene cerita biasa, hapus kelas judul
-        else {
-            fullTextBox.classList.remove('story-title-box');
-        }
         
         bgImg.src = sc.bg; 
         charImg.src = sc.char; 
@@ -636,6 +711,7 @@ function loadScene(key) {
 // --- FUNGSI NEXT SCENE ---
 function nextScene() {
     if (isTyping) {
+        // Lewati proses mengetik jika pengguna menekan tombol (atau klik/sentuh)
         isTyping = false;
         textBox.innerText = scenes[currentStoryKey].text;
         if (autoMode) {
@@ -655,6 +731,7 @@ function nextScene() {
         }
         loadScene(nextKey);
     } else {
+        // Akhir Cerita
         fullTextBox.style.opacity = 0;
         startTransition(() => {
             // Fade out BGM saat cerita berakhir
@@ -713,6 +790,7 @@ btnBack.onclick = () => {
     loadScene('selection');
 };
 
+// --- EVENT LISTENER UNTUK LANJUT SCENE (Keyboard) ---
 document.addEventListener('keydown', e => { 
     if (e.key === ' ' || e.key === 'Enter') {
         e.preventDefault();
@@ -720,6 +798,22 @@ document.addEventListener('keydown', e => {
         if (transitionOverlay.style.opacity === '0' || transitionOverlay.style.opacity === '') {
             nextScene(); 
         }
+    }
+});
+
+// --- EVENT LISTENER UNTUK LANJUT SCENE (Click/Touch - Penting untuk Mobile) ---
+document.addEventListener('click', e => {
+    // Abaikan klik pada tombol kontrol atau pilihan
+    if (e.target.closest('.fairy-btn') || e.target.closest('.thumbnail-choice') || e.target.closest('#start-button')) {
+        return; 
+    }
+    // Hanya panggil nextScene jika transisi overlay sedang tidak aktif dan gameContainer terlihat
+    if (gameContainer.style.opacity === '1' && (transitionOverlay.style.opacity === '0' || transitionOverlay.style.opacity === '')) {
+        // Jika sedang di layar seleksi, jangan lakukan apa-apa
+        if (scenes[currentStoryKey] && scenes[currentStoryKey].isSelection) {
+            return;
+        }
+        nextScene();
     }
 });
 </script>
